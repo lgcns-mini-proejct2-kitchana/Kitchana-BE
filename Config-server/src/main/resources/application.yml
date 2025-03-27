@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active:
+      - git
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Team4-Kitcha/Config.git
+          search-paths:
+            - article
+            - auth
+            - board
+            - eureka
+            - gateway
+
+server:
+  port: 8071
+
+
+encrypt:
+  key: WeAreTestOurProjectSoHappyUmmReally
+
