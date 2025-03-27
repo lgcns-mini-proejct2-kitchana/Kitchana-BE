@@ -8,7 +8,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/Team4-Kitcha/Config.git
+          uri: https://github.com/lgcns-mini-proejct2-kitchana/Config.git
           search-paths:
             - article
             - auth
