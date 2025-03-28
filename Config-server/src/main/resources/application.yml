@@ -15,10 +15,20 @@ spring:
             - board
             - eureka
             - gateway
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
 
 server:
   port: 8071
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, busrefresh
 
 encrypt:
   key: WeAreTestOurProjectSoHappyUmmReally
