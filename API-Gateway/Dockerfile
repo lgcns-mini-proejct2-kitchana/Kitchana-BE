@@ -4,6 +4,7 @@ WORKDIR /app
 COPY API-Gateway/ .
 RUN gradle build -x test --no-daemon
 
+
 # Execute part
 FROM amazoncorretto:17
 WORKDIR /app

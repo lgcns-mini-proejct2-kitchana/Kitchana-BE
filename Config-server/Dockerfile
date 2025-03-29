@@ -4,6 +4,7 @@ WORKDIR /app
 COPY Config-server/ .
 RUN gradle build --no-daemon
 
+
 # Execute part
 FROM amazoncorretto:17
 WORKDIR /app

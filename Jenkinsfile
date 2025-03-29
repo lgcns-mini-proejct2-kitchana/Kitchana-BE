@@ -5,7 +5,7 @@ def hasChangesInDir(String dir) {
 def deployToEC2(String imageName, String tag, String dockerfileName) {
     sshPublisher(publishers: [
         sshPublisherDesc(
-            configName: 'kitchana-docker',
+            configName: 'kitchana-docker',  // EC2에 대한 SSH 구성 이름
             transfers: [
                 sshTransfer(
                     cleanRemote: false,
@@ -70,9 +70,9 @@ pipeline {
                         }
                     }
 
-                    if (hasChangesInDir('Config-Server')) {
+                    if (hasChangesInDir('Config-server')) {
                         echo 'Config 변경 감지됨, 빌드 시작'
-                        dir('Config-Server') {
+                        dir('Config-server') {
                             sh './gradlew clean build -x test'
                             deployToEC2("kitchana/config-server", imageTag, "DockerfileConfig")
                         }
