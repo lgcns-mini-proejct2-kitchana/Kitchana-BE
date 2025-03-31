@@ -11,8 +11,10 @@ def deployToEC2(String imageName, String tag, String dockerfileName) {
                     cleanRemote: false,
                     excludes: '',
                     execCommand: """
+                        echo 'Starting Docker build'
                         docker build -t ${env.AWS_ECR_URI}/${imageName}:${tag} -f ./outer/${dockerfileName} .
                         
+                        echo 'Docker build finished, starting push'
                         docker push ${env.AWS_ECR_URI}/${imageName}:${tag}
                     """,
                     execTimeout: 180000,
