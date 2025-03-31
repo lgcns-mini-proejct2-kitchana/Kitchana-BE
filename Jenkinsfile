@@ -11,11 +11,9 @@ def deployToEC2(String imageName, String tag, String dockerfileName) {
                     cleanRemote: false,
                     excludes: '',
                     execCommand: """
-                        echo 'Starting Docker build'
-                        docker build -t ${env.AWS_ECR_URI}/${imageName}:${tag} -f ./outer/${dockerfileName} .
+                        docker build -t ${env.AWS_ECR_URI}/${imageName}:${tag} -f ./outer/${dockerfileName} ./outer >> build-log.txt 2>&1
                         
-                        echo 'Docker build finished, starting push'
-                        docker push ${env.AWS_ECR_URI}/${imageName}:${tag}
+                        docker push ${env.AWS_ECR_URI}/${imageName}:${tag} >> build-log.txt 2>&1
                     """,
                     execTimeout: 180000,
                     flatten: false,
@@ -24,7 +22,7 @@ def deployToEC2(String imageName, String tag, String dockerfileName) {
                     patternSeparator: '[, ]+',
                     remoteDirectory: './outer',  // remoteDirectory는 /outer로 설정
                     remoteDirectorySDF: false,
-                    removePrefix: 'build/libs',  // build/libs 경로를 제거하고 /outer 디렉토리로 복사
+                    removePrefix: 'build/libs/',  // build/libs 경로를 제거하고 /outer 디렉토리로 복사
                     sourceFiles: 'build/libs/*-SNAPSHOT.jar'
                 )
             ],
@@ -48,7 +46,7 @@ pipeline {
         GIT_TARGET_BRANCH = 'main'
         GIT_REPOSITORY_URL = 'https://github.com/lgcns-mini-proejct2-kitchana/Kitchana-BE.git'
     }
-
+    
     stages {
         stage('Github checkout') {
             steps {
