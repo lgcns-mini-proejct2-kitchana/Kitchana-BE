@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
-// Eureka 커밋 테스트
+// 젠킨슨 테스트 1
 
 @EnableEurekaServer
 @SpringBootApplication
