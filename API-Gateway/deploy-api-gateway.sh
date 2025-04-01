@@ -3,7 +3,7 @@
 
 set -e
 
-COMPOSE_DIR="/home/ec2-user/inner"
+COMPOSE_DIR="/home/ec2-user/outer"
 
 cd "$COMPOSE_DIR" || { echo "Compose directory not found"; exit 1; }
 
@@ -11,4 +11,4 @@ cd "$COMPOSE_DIR" || { echo "Compose directory not found"; exit 1; }
 sed -i "s|^API_GATEWAY_TAG=.*|API_GATEWAY_TAG=$TAG|" .env
 
 # api-gateway 컨테이너 강제 재시작
-docker-compose -f docker-compose-inner.yml up -d --no-deps --force-recreate api-gateway
+docker-compose -f docker-compose-outer.yml up -d --no-deps --force-recreate api-gateway
