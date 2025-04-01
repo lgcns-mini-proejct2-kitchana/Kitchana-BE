@@ -5,14 +5,13 @@ def hasChangesInDir(String dir) {
 def deployToEC2(String imageName, String tag, String dockerfileName) {
     sshPublisher(publishers: [
         sshPublisherDesc(
-            configName: 'kitchana-docker',  // EC2에 대한 SSH 구성 이름
+            configName: 'kitchana-docker',
             transfers: [
                 sshTransfer(
                     cleanRemote: false,
                     excludes: '',
                     execCommand: """
                         docker build -t ${env.AWS_ECR_URI}/${imageName}:${tag} -f ./outer/${dockerfileName} ./outer >> build-log.txt 2>&1
-                        
                         docker push ${env.AWS_ECR_URI}/${imageName}:${tag} >> build-log.txt 2>&1
                     """,
                     execTimeout: 180000,
@@ -20,9 +19,9 @@ def deployToEC2(String imageName, String tag, String dockerfileName) {
                     makeEmptyDirs: false,
                     noDefaultExcludes: false,
                     patternSeparator: '[, ]+',
-                    remoteDirectory: './outer',  // remoteDirectory는 /outer로 설정
+                    remoteDirectory: './outer',
                     remoteDirectorySDF: false,
-                    removePrefix: 'build/libs/',  // build/libs 경로를 제거하고 /outer 디렉토리로 복사
+                    removePrefix: 'build/libs/',
                     sourceFiles: 'build/libs/*-SNAPSHOT.jar'
                 )
             ],
@@ -32,7 +31,6 @@ def deployToEC2(String imageName, String tag, String dockerfileName) {
         )
     ])
 }
-
 
 pipeline {
     agent any
@@ -62,28 +60,116 @@ pipeline {
                 script {
                     def imageTag = env.BUILD_NUMBER
                     echo "사용될 Image Tag: ${imageTag}"
+                    
+                    // eureka 배포
                     if (hasChangesInDir('eureka')) {
                         echo 'Eureka 변경 감지됨, 빌드 시작'
                         dir('eureka') {
                             sh './gradlew clean build -x test'
                             deployToEC2("kitchana/eureka", imageTag, "DockerfileEureka")
                         }
+                        sshPublisher(publishers: [
+                            sshPublisherDesc(
+                                configName: 'kitchana-docker',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: false,
+                                        excludes: '',
+                                        sourceFiles: 'deploy-eureka.sh',
+                                        removePrefix: '',
+                                        remoteDirectory: '/tmp',
+                                        execCommand: """
+                                            cd /home/ec2-user/tmp
+                                            chmod +x deploy-eureka.sh
+                                            export TAG=${imageTag}
+                                            ./deploy-eureka.sh
+                                        """,
+                                        execTimeout: 180000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+'
+                                    )
+                                ],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: false
+                            )
+                        ])
                     }
-
+                    
+                    // Config-server 배포
                     if (hasChangesInDir('Config-server')) {
-                        echo 'Config 변경 감지됨, 빌드 시작'
+                        echo 'Config-server 변경 감지됨, 빌드 시작'
                         dir('Config-server') {
                             sh './gradlew clean build -x test'
                             deployToEC2("kitchana/config-server", imageTag, "DockerfileConfig")
                         }
+                        sshPublisher(publishers: [
+                            sshPublisherDesc(
+                                configName: 'kitchana-docker',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: false,
+                                        excludes: '',
+                                        sourceFiles: 'deploy-config-server.sh',
+                                        removePrefix: '',
+                                        remoteDirectory: '/tmp',
+                                        execCommand: """
+                                            cd /home/ec2-user/tmp
+                                            chmod +x deploy-config-server.sh
+                                            export TAG=${imageTag}
+                                            ./deploy-config-server.sh
+                                        """,
+                                        execTimeout: 180000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+'
+                                    )
+                                ],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: false
+                            )
+                        ])
                     }
-
+                    
+                    // API-Gateway 배포
                     if (hasChangesInDir('API-Gateway')) {
-                        echo 'Gateway 변경 감지됨, 빌드 시작'
+                        echo 'API-Gateway 변경 감지됨, 빌드 시작'
                         dir('API-Gateway') {
                             sh './gradlew clean build -x test'
                             deployToEC2("kitchana/api-gateway", imageTag, "DockerfileGateway")
                         }
+                        sshPublisher(publishers: [
+                            sshPublisherDesc(
+                                configName: 'kitchana-docker',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: false,
+                                        excludes: '',
+                                        sourceFiles: 'deploy-api-gateway.sh',
+                                        removePrefix: '',
+                                        remoteDirectory: '/tmp',
+                                        execCommand: """
+                                            cd /home/ec2-user/tmp
+                                            chmod +x deploy-api-gateway.sh
+                                            export TAG=${imageTag}
+                                            ./deploy-api-gateway.sh
+                                        """,
+                                        execTimeout: 180000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+'
+                                    )
+                                ],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: false
+                            )
+                        ])
                     }
                 }
             }
