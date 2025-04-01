@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
 
-// 젠킨슨 테스트 1
+// 젠킨슨 빌드 테스트
 
 @SpringBootApplication
 @EnableConfigServer
