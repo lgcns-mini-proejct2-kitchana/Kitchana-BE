@@ -4,7 +4,7 @@
 set -e
 
 # docker-compose.yml 파일이 위치한 디렉토리 (필요에 따라 수정)
-COMPOSE_DIR="/home/ec2-user/inner"
+COMPOSE_DIR="/home/ec2-user/outer"
 
 cd "$COMPOSE_DIR" || { echo "Compose directory not found"; exit 1; }
 
@@ -12,4 +12,4 @@ cd "$COMPOSE_DIR" || { echo "Compose directory not found"; exit 1; }
 sed -i "s|^EUREKA_TAG=.*|EUREKA_TAG=$TAG|" .env
 
 # eureka 컨테이너 강제 재시작
-docker-compose -f docker-compose-inner.yml up -d --no-deps --force-recreate eureka
+docker-compose -f docker-compose-outer.yml up -d --no-deps --force-recreate eureka
