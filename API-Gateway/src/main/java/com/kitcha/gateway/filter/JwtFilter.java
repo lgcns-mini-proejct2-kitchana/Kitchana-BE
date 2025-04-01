@@ -28,7 +28,7 @@ public class JwtFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-        String method = exchange.getRequest().getMethodValue();
+        String method = exchange.getRequest().getMethod().name();
         
         // ✅ OPTIONS 요청은 무조건 허용 (Preflight 대응)
         if ("OPTIONS".equalsIgnoreCase(method)) {
