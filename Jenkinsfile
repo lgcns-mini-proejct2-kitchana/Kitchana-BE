@@ -35,6 +35,10 @@ def deployToEC2(String imageName, String tag, String dockerfileName) {
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'TAG', defaultValue: 'latest', description: 'Docker Image Tag')
+    }
+
     tools {
         gradle 'gradle8.12.1'
         jdk 'jdk17'
@@ -58,7 +62,8 @@ pipeline {
         stage('Deploy Changed Services') {
             steps {
                 script {
-                    def imageTag = env.BUILD_NUMBER
+                    // TAG 파라미터에 따라 태그를 설정 (기본값이 'latest'면 빌드 번호 사용)
+                    def imageTag = (params.TAG == 'latest' || params.TAG.trim() == '') ? env.BUILD_NUMBER : params.TAG
                     echo "사용될 Image Tag: ${imageTag}"
                     
                     // eureka 배포
